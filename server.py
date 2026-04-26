@@ -3,22 +3,12 @@ from flask import Flask, render_template, request
 from EmotionDetection.emotion_detection import emotion_detector
 
 app = Flask(__name__)
-COUNTER_FILE = "visitor_count.txt"
 
+# مترجم المشاعر
 emotion_map = {
     "joy": "السعادة 😊", "anger": "الغضب 😡", 
     "disgust": "الاشمئزاز 🤢", "fear": "الخوف 😨", "sadness": "الحزن 😢"
 }
-
-def get_visitor_count():
-    if not os.path.exists(COUNTER_FILE):
-        with open(COUNTER_FILE, "w") as f: f.write("0")
-    with open(COUNTER_FILE, "r") as f:
-        try: count = int(f.read())
-        except: count = 0
-    count += 1
-    with open(COUNTER_FILE, "w") as f: f.write(str(count))
-    return count
 
 @app.route("/emotionDetector")
 def sent_detector():
@@ -27,8 +17,8 @@ def sent_detector():
     if not text: return "Input is empty!"
     
     result = emotion_detector(text)
-    count = get_visitor_count()
     
+    # الرد بناءً على نوع النتيجة (شخصي أو تحليل مشاعر)
     if result.get('is_personal'):
         res_text = result['dominant_emotion']
     else:
@@ -38,7 +28,8 @@ def sent_detector():
             res_text = result['dominant_emotion']
 
     prefix = "النتيجة: " if ui_lang == "ar" else "Result: "
-    user_msg = f"أنت المستخدم رقم: {count}" if ui_lang == "ar" else f"You are visitor number: {count}"
+    # عداد وهمي بسيط أو جملة ترحيبية لأن فيرسال لا يدعم الكتابة على الملفات
+    user_msg = "منور الموقع يا بطل!" if ui_lang == "ar" else "Welcome to the site, hero!"
     
     return f"{prefix} <b>{res_text}</b> <br><small>{user_msg}</small>"
 
