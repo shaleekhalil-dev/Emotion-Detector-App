@@ -3,30 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emotion Detector</title>
+    <title>AI Emotion Detector | Shalee Khalil</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; }
+        .card { border-radius: 15px; border: none; }
+        #system_response { transition: all 0.3s ease; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card shadow-lg p-5">
+                    <h1 class="text-center fw-bold text-dark mb-4">Emotion Detector 🧠</h1>
+                    <p class="text-muted text-center">Analyze the emotional tone of your text using AI</p>
+                    
+                    <textarea id="textToAnalyze" class="form-control mb-4" rows="4" placeholder="Type how you feel... (e.g., I am so excited about this project!)"></textarea>
+                    
+                    <button class="btn btn-primary btn-lg w-100 fw-bold" onclick="analyze()">Analyze Emotion</button>
+                    
+                    <div id="system_response" class="mt-4 p-3 border rounded bg-light text-dark d-none">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let analyze = () => {
-            let textToAnalyze = document.getElementById("textToAnalyze").value;
-            let xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById("system_response").innerHTML = xhttp.responseText;
-                }
-            };
-            xhttp.open("GET", "emotionDetector?textToAnalyze=" + textToAnalyze, true);
-            xhttp.send();
+        function analyze() {
+            let text = document.getElementById("textToAnalyze").value;
+            let display = document.getElementById("system_response");
+
+            if (!text.trim()) {
+                alert("Please write something first!");
+                return;
+            }
+
+            display.classList.remove("d-none");
+            display.innerHTML = "Processing... ✨";
+
+            fetch("/emotionDetector?textToAnalyze=" + encodeURIComponent(text))
+                .then(response => response.text())
+                .then(data => {
+                    display.innerHTML = data;
+                })
+                .catch(err => {
+                    display.innerHTML = "Error connecting to the server.";
+                });
         }
     </script>
-</head>
-<body class="container mt-5">
-    <div class="card shadow p-4">
-        <h1 class="text-center mb-4">Emotion Detector</h1>
-        <p class="lead">Enter the text you want to analyze for emotional content:</p>
-        <textarea id="textToAnalyze" class="form-control mb-3" rows="4" placeholder="Type your text here..."></textarea>
-        <button class="btn btn-primary w-100" onclick="analyze()">Analyze Text</button>
-        <div id="system_response" class="mt-4 p-3 border rounded bg-light fw-bold text-primary">
-            </div>
-    </div>
 </body>
 </html>
